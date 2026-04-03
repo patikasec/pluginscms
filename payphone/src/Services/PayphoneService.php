@@ -105,11 +105,30 @@ class PayphoneService extends AbstractPayment
             
             $baseUrl = $isSandbox ? $this->sandboxUrl : $this->baseUrl;
 
-            // Obtener datos del cliente si están disponibles
+            // Obtener datos del cliente (REQUERIDOS por Payphone)
             $clientEmail = $data['client_email'] ?? null;
             $clientName = $data['client_name'] ?? null;
             $clientPhone = $data['client_phone'] ?? null;
             $description = $data['description'] ?? 'Pago de pedido #' . $orderId;
+
+            // Validar campos requeridos por Payphone
+            $missingFields = [];
+            if (empty($clientEmail)) {
+                $missingFields[] = 'email';
+            }
+            if (empty($clientName)) {
+                $missingFields[] = 'nombre';
+            }
+            if (empty($clientPhone)) {
+                $missingFields[] = 'teléfono';
+            }
+
+            if (!empty($missingFields)) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Los siguientes campos son requeridos: ' . implode(', ', $missingFields) . '. Por favor completa tu información de contacto en el checkout.',
+                ];
+            }
 
             // Crear payload para Payphone
             $payload = [
@@ -122,18 +141,10 @@ class PayphoneService extends AbstractPayment
                     'order_id' => $orderId,
                     'description' => $description,
                 ],
+                'client_email' => $clientEmail,
+                'client_name' => $clientName,
+                'client_phone' => $clientPhone,
             ];
-
-            // Agregar datos del cliente si están disponibles (requeridos por Payphone)
-            if ($clientEmail) {
-                $payload['client_email'] = $clientEmail;
-            }
-            if ($clientName) {
-                $payload['client_name'] = $clientName;
-            }
-            if ($clientPhone) {
-                $payload['client_phone'] = $clientPhone;
-            }
 
             // Crear orden en Payphone
             $response = Http::withHeaders([
