@@ -105,12 +105,14 @@ class PayphoneService extends AbstractPayment
             
             $baseUrl = $isSandbox ? $this->sandboxUrl : $this->baseUrl;
 
-            // Crear orden en Payphone
-            $response = Http::withHeaders([
-                'Authorization' => "Bearer {$token}",
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])->post("{$baseUrl}/v2/charges", [
+            // Obtener datos del cliente si están disponibles
+            $clientEmail = $data['client_email'] ?? null;
+            $clientName = $data['client_name'] ?? null;
+            $clientPhone = $data['client_phone'] ?? null;
+            $description = $data['description'] ?? 'Pago de pedido #' . $orderId;
+
+            // Crear payload para Payphone
+            $payload = [
                 'external_order_id' => (string) $orderId,
                 'amount' => round($amount, 2),
                 'currency' => 'USD',
@@ -118,9 +120,27 @@ class PayphoneService extends AbstractPayment
                 'webhook_url' => route('payments.payphone.webhook'),
                 'metadata' => [
                     'order_id' => $orderId,
-                    'description' => $data['description'] ?? 'Pago de pedido',
+                    'description' => $description,
                 ],
-            ]);
+            ];
+
+            // Agregar datos del cliente si están disponibles (requeridos por Payphone)
+            if ($clientEmail) {
+                $payload['client_email'] = $clientEmail;
+            }
+            if ($clientName) {
+                $payload['client_name'] = $clientName;
+            }
+            if ($clientPhone) {
+                $payload['client_phone'] = $clientPhone;
+            }
+
+            // Crear orden en Payphone
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post("{$baseUrl}/v2/charges", $payload);
 
             if ($response->successful()) {
                 $result = $response->json();
@@ -133,9 +153,26 @@ class PayphoneService extends AbstractPayment
                 ];
             }
 
+            // Manejar errores específicos de campos requeridos
+            $errorMessage = $response->json('message', trans('plugins/payphone::payphone.payment_failed'));
+            $errors = $response->json('errors', []);
+            
+            if (!empty($errors)) {
+                // Formatear errores de validación
+                $errorMessages = [];
+                foreach ($errors as $field => $messages) {
+                    if (is_array($messages)) {
+                        $errorMessages[] = implode(', ', $messages);
+                    } else {
+                        $errorMessages[] = $messages;
+                    }
+                }
+                $errorMessage = implode('. ', $errorMessages);
+            }
+
             return [
                 'status' => 'error',
-                'message' => $response->json('message', trans('plugins/payphone::payphone.payment_failed')),
+                'message' => $errorMessage,
             ];
 
         } catch (Throwable $e) {

@@ -13,4 +13,8 @@ return [
     'payment_cancelled' => 'Payment was cancelled',
     'refund_success' => 'Refund processed successfully',
     'refund_failed' => 'Error processing refund',
+    'redirecting_message' => 'Redirecting to Payphone payment gateway...',
+    'payment_initiation_failed' => 'Could not initiate payment. Please try again or contact support.',
+    'return_to_checkout' => 'Return to checkout',
+    'missing_fields' => 'This field is required.',
 ];
