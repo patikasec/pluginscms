@@ -1,0 +1,14 @@
+{
+    "id": "botble/payphone",
+    "name": "Payphone Payment Gateway",
+    "namespace": "Botble\\Payphone\\",
+    "provider": "Botble\\Payphone\\Providers\\PayphoneServiceProvider",
+    "author": "Botble Technologies",
+    "url": "https://botble.com",
+    "version": "1.0.0",
+    "description": "Payphone payment gateway integration",
+    "minimum_core_version": "7.3.0",
+    "require": [
+        "botble/payment"
+    ]
+}

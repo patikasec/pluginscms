@@ -1,0 +1,8 @@
+{
+    "name": "botble/payphone",
+    "description": "Payphone Payment Gateway",
+    "type": "package",
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
