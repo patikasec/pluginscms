@@ -105,39 +105,14 @@ class PayphoneService extends AbstractPayment
             
             $baseUrl = $isSandbox ? $this->sandboxUrl : $this->baseUrl;
 
-            // Obtener datos del cliente (REQUERIDOS por Payphone)
+            // Obtener datos del cliente (opcionales según configuración de Payphone)
             $clientEmail = $data['client_email'] ?? null;
             $clientName = $data['client_name'] ?? null;
             $clientPhone = $data['client_phone'] ?? null;
-            $clientIdNumber = $data['client_id_number'] ?? null; // Cédula/DNI (opcional según configuración)
+            $clientIdNumber = $data['client_id_number'] ?? null; // Cédula/DNI
             $description = $data['description'] ?? 'Pago de pedido #' . $orderId;
 
-            // Validar campos requeridos básicos por Payphone
-            $missingFields = [];
-            if (empty($clientEmail)) {
-                $missingFields[] = 'email';
-            }
-            if (empty($clientName)) {
-                $missingFields[] = 'nombre';
-            }
-            if (empty($clientPhone)) {
-                $missingFields[] = 'teléfono';
-            }
-
-            // Nota: La cédula puede ser requerida según tu configuración en Payphone
-            // Si necesitas validar cédula, descomenta las siguientes líneas:
-            // if (empty($clientIdNumber)) {
-            //     $missingFields[] = 'cédula';
-            // }
-
-            if (!empty($missingFields)) {
-                return [
-                    'status' => 'error',
-                    'message' => 'Los siguientes campos son requeridos: ' . implode(', ', $missingFields) . '. Por favor completa tu información de contacto en el checkout.',
-                ];
-            }
-
-            // Crear payload para Payphone
+            // Construir payload base (campos mínimos requeridos por API Payphone)
             $payload = [
                 'external_order_id' => (string) $orderId,
                 'amount' => round($amount, 2),
@@ -148,12 +123,19 @@ class PayphoneService extends AbstractPayment
                     'order_id' => $orderId,
                     'description' => $description,
                 ],
-                'client_email' => $clientEmail,
-                'client_name' => $clientName,
-                'client_phone' => $clientPhone,
             ];
 
-            // Agregar cédula si está disponible (Payphone la acepta como campo adicional)
+            // Agregar datos del cliente si están disponibles
+            // Payphone acepta estos campos pero pueden ser opcionales según tu configuración
+            if (!empty($clientEmail)) {
+                $payload['client_email'] = $clientEmail;
+            }
+            if (!empty($clientName)) {
+                $payload['client_name'] = $clientName;
+            }
+            if (!empty($clientPhone)) {
+                $payload['client_phone'] = $clientPhone;
+            }
             if (!empty($clientIdNumber)) {
                 $payload['client_id_number'] = $clientIdNumber;
             }
