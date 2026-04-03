@@ -109,9 +109,10 @@ class PayphoneService extends AbstractPayment
             $clientEmail = $data['client_email'] ?? null;
             $clientName = $data['client_name'] ?? null;
             $clientPhone = $data['client_phone'] ?? null;
+            $clientIdNumber = $data['client_id_number'] ?? null; // Cédula/DNI (opcional según configuración)
             $description = $data['description'] ?? 'Pago de pedido #' . $orderId;
 
-            // Validar campos requeridos por Payphone
+            // Validar campos requeridos básicos por Payphone
             $missingFields = [];
             if (empty($clientEmail)) {
                 $missingFields[] = 'email';
@@ -122,6 +123,12 @@ class PayphoneService extends AbstractPayment
             if (empty($clientPhone)) {
                 $missingFields[] = 'teléfono';
             }
+
+            // Nota: La cédula puede ser requerida según tu configuración en Payphone
+            // Si necesitas validar cédula, descomenta las siguientes líneas:
+            // if (empty($clientIdNumber)) {
+            //     $missingFields[] = 'cédula';
+            // }
 
             if (!empty($missingFields)) {
                 return [
@@ -145,6 +152,11 @@ class PayphoneService extends AbstractPayment
                 'client_name' => $clientName,
                 'client_phone' => $clientPhone,
             ];
+
+            // Agregar cédula si está disponible (Payphone la acepta como campo adicional)
+            if (!empty($clientIdNumber)) {
+                $payload['client_id_number'] = $clientIdNumber;
+            }
 
             // Crear orden en Payphone
             $response = Http::withHeaders([
