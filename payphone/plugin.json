@@ -1,13 +1,14 @@
 {
-    "id": "payphone",
-    "namespace": "Botble\\Payphone",
-    "name": "Payphone",
-    "description": "Integración de pagos con Payphone (Ecuador). Soporta cajita de pagos, tarjetas y saldo Payphone.",
-    "author": "Botble",
-    "version": "1.0.0",
-    "min_core_version": "7.0.0",
+    "id": "botble/payphone",
+    "name": "Payphone Payment Gateway",
+    "namespace": "Botble\\Payphone\\",
     "provider": "Botble\\Payphone\\Providers\\PayphoneServiceProvider",
-    "aliases": {},
-    "files": [],
-    "requires": []
+    "author": "Botble Technologies",
+    "url": "https://botble.com",
+    "version": "1.0.0",
+    "description": "Payphone payment gateway integration",
+    "minimum_core_version": "7.3.0",
+    "require": [
+        "botble/payment"
+    ]
 }

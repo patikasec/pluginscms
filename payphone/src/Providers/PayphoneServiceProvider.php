@@ -2,36 +2,28 @@
 
 namespace Botble\Payphone\Providers;
 
-use Botble\Base\Facades\PanelSectionManager;
-use Botble\Base\Providers\ServiceProvider;
-use Botble\Payment\Facades\Payment;
-use Botble\Payphone\Services\PayphoneService;
+use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
 
-class PayphoneServiceProvider extends ServiceProvider
+class PayphoneServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+    use LoadAndPublishDataTrait;
+
     public function boot(): void
     {
-        $this->app->booted(function () {
-            $this->registerConfig();
-            
-            Payment::registerMethod(new PayphoneService());
-            
-            PanelSectionManager::default()->beforeRendering('payment', function () {
-                add_filter(BASE_FILTER_AFTER_HEADER_CORE, function (?string $html): string {
-                    return $html . view('plugins/payphone::partials.payphone-script')->render();
-                }, 12);
-            });
-        });
+        if (! is_plugin_active('payment')) {
+            return;
+        }
 
-        $this->loadRoutes();
-        $this->loadTranslations();
-        $this->loadViews();
-    }
+        $this->setNamespace('plugins/payphone')
+            ->loadHelpers()
+            ->loadRoutes()
+            ->loadAndPublishTranslations()
+            ->loadAndPublishViews()
+            ->publishAssets();
 
-    protected function registerConfig(): void
-    {
-        $this->publishes([
-            __DIR__ . '/../../config/general.php' => config_path('general.php'),
-        ], 'payphone-config');
+        $this->app->register(HookServiceProvider::class);
     }
 }
+

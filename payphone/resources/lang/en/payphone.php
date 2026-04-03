@@ -1,20 +1,8 @@
 <?php
 
 return [
-    'name' => 'Payphone',
-    'description' => 'Pay securely with Payphone. Accepts cards and Payphone balance.',
-    'enable' => 'Enable Payphone',
-    'token' => 'API Token',
-    'store_id' => 'Store ID',
-    'sandbox_mode' => 'Sandbox Mode',
-    'payment_initiated' => 'Payment initiated successfully',
-    'payment_success' => 'Payment approved successfully',
-    'payment_failed' => 'Payment failed',
-    'payment_cancelled' => 'Payment was cancelled',
-    'refund_success' => 'Refund processed successfully',
-    'refund_failed' => 'Error processing refund',
-    'redirecting_message' => 'Redirecting to Payphone payment gateway...',
-    'payment_initiation_failed' => 'Could not initiate payment. Please try again or contact support.',
-    'return_to_checkout' => 'Return to checkout',
-    'missing_fields' => 'This field is required.',
+    'payment_failed' => 'Payment failed! Please try again.',
+    'no_transaction_id' => 'No transaction ID provided. Please try again.',
+    'payment_confirmation_failed' => 'Payment confirmation failed. Please contact support.',
+    'credentials_not_configured' => 'Payphone credentials are not configured. Please contact the administrator.',
 ];

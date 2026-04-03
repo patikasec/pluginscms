@@ -1,49 +1,89 @@
-# Payphone Payment Gateway for Botble CMS
+# Payphone Payment Gateway Plugin for Botble CMS
 
-Plugin de integración con la pasarela de pagos **Payphone** (Ecuador) para Botble CMS.
+This plugin integrates Payphone payment gateway into your Botble CMS e-commerce platform.
 
-## Características
+## Features
 
-- Cajita de pagos Payphone (iframe)
-- Soporte para tarjetas de crédito/débito
-- Soporte para saldo Payphone
-- Confirmación automática de pagos vía callback
-- Reembolsos en línea
-- Conversión automática a USD
-- Configuración desde el panel de administración
+- Accept payments via Payphone's "Cajita de Pagos" (Payment Box)
+- Support for credit/debit cards (Visa, MasterCard, Diners Club, Discover)
+- Support for Payphone balance payments
+- Secure transaction confirmation via Payphone API
+- Online refund support
+- Multi-currency support (USD primary)
 
-## Requisitos
+## Requirements
 
-- PHP 8.2 o superior
-- Botble CMS 7.0.0 o superior
-- Token y Store ID de Payphone
+- Botble CMS 7.3.0 or higher
+- PHP 8.0+
+- Active Payphone Business account
+- SSL certificate (for production)
 
-## Instalación
+## Installation
 
-1. Copia la carpeta `payphone` en `platform/plugins/` de tu instalación de Botble.
-2. Activa el plugin desde el panel de administración o ejecuta:
-   ```bash
-   php artisan cms:plugin:activate payphone
-   ```
-3. Ve a **Configuración > Pagos** y configura:
-   - **Token**: Tu token de API de Payphone
-   - **Store ID**: Tu ID de tienda de Payphone
-   - **Modo de prueba**: Actívalo para usar el entorno sandbox
+1. Copy the `payphone` folder to `platform/plugins/` directory
+2. Go to Admin Panel → Plugins and activate "Payphone Payment Gateway"
+3. Navigate to Settings → Payment → Payphone
+4. Configure your credentials:
+   - **Token**: Your Payphone Bearer Token
+   - **Store ID**: Your Store ID from Payphone Developer Dashboard
 
-## Configuración en Payphone
+## Configuration
 
-1. Regístrate en [Payphone](https://payphone.app/)
-2. Obtén tu Token y Store ID desde el dashboard
-3. Configura las URLs de callback si es necesario
+### Getting Credentials
 
-## Uso
+1. Log in to your Payphone Business account
+2. Go to Developer section
+3. Create a new WEB application
+4. Configure your domain and response URL
+5. Copy the Token and Store ID
 
-Una vez activado, los clientes podrán seleccionar "Payphone" como método de pago durante el checkout. Serán redirigidos a la cajita de pagos de Payphone para completar la transacción.
+### Setting up the Payment Box
 
-## Soporte
+The plugin automatically includes the Payphone Payment Box SDK. When customers select Payphone as payment method, they will see the payment box embedded in your checkout page.
 
-Para problemas o sugerencias, por favor crea un issue en el repositorio.
+### Webhook/Callback URL
 
-## Licencia
+Configure your callback URL in Payphone dashboard:
+```
+https://yourdomain.com/payment/payphone/callback
+```
 
-MIT
+## How It Works
+
+1. Customer selects Payphone at checkout
+2. Payphone Payment Box appears with configured amount
+3. Customer completes payment via card or Payphone balance
+4. Payphone redirects to your success/cancel URL
+5. Plugin confirms transaction with Payphone API
+6. Order status is updated accordingly
+
+**Important**: Transactions must be confirmed within 5 minutes, otherwise Payphone will automatically reverse them.
+
+## Supported Currencies
+
+- USD (primary)
+
+## Transaction Flow
+
+```
+Checkout → Payphone Box → Payment Processing → Callback → Confirmation → Complete
+```
+
+## Troubleshooting
+
+### Payment not confirming
+- Verify your Token and Store ID are correct
+- Check that your domain is registered in Payphone dashboard
+- Ensure SSL certificate is valid
+
+### Currency errors
+- Payphone primarily supports USD
+- Other currencies will be converted to USD automatically
+
+## Support
+
+For technical support, contact Payphone developer support or visit https://docs.payphone.app
+
+## License
+
+This plugin is proprietary and requires a valid Botble CMS license.

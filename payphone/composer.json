@@ -1,31 +1,8 @@
 {
     "name": "botble/payphone",
-    "description": "Payphone payment gateway plugin for Botble CMS",
+    "description": "Payphone Payment Gateway",
     "type": "package",
-    "keywords": ["botble", "laravel", "ecommerce", "payment", "payphone", "ecuador"],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Botble",
-            "email": "support@botble.com"
-        }
-    ],
     "require": {
-        "php": "^8.2",
-        "ext-json": "*"
-    },
-    "autoload": {
-        "psr-4": {
-            "Botble\\Payphone\\": "src"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Botble\\Payphone\\Providers\\PayphoneServiceProvider"
-            ]
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+        "guzzlehttp/guzzle": "^7.0"
+    }
 }

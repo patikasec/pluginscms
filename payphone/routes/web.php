@@ -1,12 +1,25 @@
 <?php
 
-use Botble\Base\Facades\Html;
+use Botble\Payphone\Http\Controllers\PayphoneController;
+use Botble\Theme\Facades\Theme;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
-use Botble\Payment\Http\Controllers\PaymentController;
 
-Route::group(['namespace' => 'Botble\Payphone\Http\Controllers'], function () {
-    Route::prefix('payments/payphone')->name('payments.payphone.')->group(function () {
-        Route::get('callback', [PaymentController::class, 'execute'])->name('callback');
-        Route::post('webhook', [PaymentController::class, 'execute'])->name('webhook');
+Route::prefix('payment/payphone')
+    ->name('payments.payphone.')
+    ->group(function (): void {
+        Route::post('webhook', [PayphoneController::class, 'callback'])
+            ->withoutMiddleware([VerifyCsrfToken::class])
+            ->name('webhook');
     });
+
+Theme::registerRoutes(function (): void {
+    Route::prefix('payment/payphone')
+        ->name('payments.payphone.')
+        ->group(function (): void {
+            Route::get('success', [PayphoneController::class, 'success'])->name('success');
+            Route::get('error', [PayphoneController::class, 'error'])->name('error');
+            Route::any('callback', [PayphoneController::class, 'callback'])->name('callback');
+        });
 });
+
