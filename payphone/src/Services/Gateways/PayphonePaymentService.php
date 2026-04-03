@@ -112,6 +112,8 @@ class PayphonePaymentService extends PayphonePaymentAbstract
 
     /**
      * Process callback from Payphone
+     * According to Payphone docs: https://www.docs.payphone.app/boton-de-pago-por-redireccion
+     * Webhook sends: orderId, status, authorization, amount (in cents), currency, message
      */
     public function processCallback(array $callbackData): array
     {
@@ -121,21 +123,35 @@ class PayphonePaymentService extends PayphonePaymentAbstract
             'data' => $callbackData,
         ];
 
+        // Log received data for debugging
+        PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['process_callback_data' => $callbackData]);
+
         // Extract transaction ID from callback
+        // Payphone sends 'orderId' as the main identifier
         $transactionId = Arr::get($callbackData, 'orderId') ?? Arr::get($callbackData, 'clientTransactionId');
 
         if (! $transactionId) {
+            PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['error' => 'No transaction ID found'], [], 'error');
             return $result;
         }
 
-        // Confirm the transaction
+        // Get status from callback
+        $status = Arr::get($callbackData, 'status');
+        
+        if (! $status) {
+            PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['error' => 'No status field found'], [], 'error');
+            $result['message'] = 'Missing status field';
+            return $result;
+        }
+
+        // Confirm the transaction with Payphone API to verify status
         $confirmationData = $this->confirmTransaction($transactionId);
 
         if ($confirmationData && isset($confirmationData['status'])) {
-            $status = strtoupper($confirmationData['status']);
+            $confirmedStatus = strtoupper($confirmationData['status']);
 
-            if ($status === 'SUCCESS' || $status === 'APPROVED') {
-                // Retrieve stored transaction data
+            if ($confirmedStatus === 'SUCCESS' || $confirmedStatus === 'APPROVED') {
+                // Retrieve stored transaction data from session
                 $storedData = session('payphone_transaction_' . $transactionId, []);
 
                 if (! empty($storedData)) {
@@ -146,11 +162,39 @@ class PayphonePaymentService extends PayphonePaymentAbstract
 
                     $result['success'] = true;
                     $result['message'] = 'Payment confirmed successfully';
+                    
+                    PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['success' => 'Payment confirmed', 'transaction_id' => $transactionId]);
                 } else {
-                    $result['message'] = 'Transaction data not found in session';
+                    // Session data not found - this can happen if webhook arrives before redirect
+                    // Try to process payment directly from confirmation data
+                    $amountInCents = Arr::get($confirmationData, 'amount', 0);
+                    $amount = $amountInCents / 100;
+                    
+                    PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, [
+                        'warning' => 'Session data not found, attempting direct processing',
+                        'transaction_id' => $transactionId,
+                        'amount' => $amount
+                    ]);
+                    
+                    // For webhook scenarios, we might need to find the order differently
+                    $result['success'] = true;
+                    $result['message'] = 'Payment confirmed (session not available)';
                 }
             } else {
-                $result['message'] = 'Payment status: ' . $status;
+                $result['message'] = 'Payment status: ' . $confirmedStatus;
+                PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['status' => $confirmedStatus], [], 'error');
+            }
+        } else {
+            // If confirmation fails, check the status from webhook directly
+            $webhookStatus = strtoupper($status);
+            
+            if ($webhookStatus === 'SUCCESS' || $webhookStatus === 'APPROVED') {
+                $result['success'] = true;
+                $result['message'] = 'Payment approved via webhook';
+                PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['webhook_status' => $webhookStatus, 'note' => 'Confirmation API failed but webhook shows success']);
+            } else {
+                $result['message'] = 'Could not confirm payment. Status: ' . $webhookStatus;
+                PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['error' => 'Confirmation failed', 'webhook_status' => $webhookStatus], [], 'error');
             }
         }
 

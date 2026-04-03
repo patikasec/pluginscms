@@ -26,9 +26,20 @@ class PayphoneController extends BaseController
     public function callback(Request $request, PayphonePaymentService $payphoneService, BaseHttpResponse $response)
     {
         try {
-            // Get callback parameters from Payphone (handle both JSON and form data)
+            // Get all input data (handle both JSON and form data)
             $content = $request->getContent();
             
+            // Log raw request details for debugging
+            $rawData = [
+                'raw_content' => $content,
+                'request_method' => $request->method(),
+                'content_type' => $request->header('Content-Type'),
+                'all_input' => $request->all(),
+                'headers' => $request->headers->all(),
+            ];
+            
+            PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['webhook_request' => $rawData]);
+
             // Try to parse as JSON first
             $callbackData = !empty($content) ? json_decode($content, true) : [];
             
@@ -37,18 +48,16 @@ class PayphoneController extends BaseController
                 $callbackData = $request->all();
             }
 
-            $this->logWebhook([
-                'callback_received' => true,
-                'raw_content' => $content,
-                'parsed_data' => $callbackData,
-                'headers' => $request->headers->all(),
-            ]);
-
-            // Validate required fields
-            if (empty($callbackData)) {
+            // Validate required fields according to Payphone documentation
+            // Payphone sends: orderId, status, authorization, amount (in cents), currency
+            $orderId = Arr::get($callbackData, 'orderId') ?? Arr::get($callbackData, 'clientTransactionId');
+            $status = Arr::get($callbackData, 'status');
+            
+            if (empty($orderId)) {
+                PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['error' => 'Missing orderId'], [], 'error');
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'No data received'
+                    'message' => 'Missing orderId field'
                 ], 400);
             }
 
@@ -63,13 +72,15 @@ class PayphoneController extends BaseController
                 ], 200);
             }
 
-            // Return error but still 200 to acknowledge receipt
+            // Log error but still return 200 to acknowledge receipt
+            PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['processing_error' => $result['message']]);
             return response()->json([
                 'status' => 'error',
                 'message' => $result['message'] ?? 'Payment processing failed'
             ], 200);
         } catch (Exception $exception) {
             BaseHelper::logError($exception);
+            PaymentHelper::log(PAYPHONE_PAYMENT_METHOD_NAME, ['exception' => $exception->getMessage()], [], 'error');
 
             // Still return 200 to acknowledge receipt and prevent retries
             return response()->json([
