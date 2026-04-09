@@ -1,19 +1,17 @@
 {
-  "name": "fundacion-website",
+  "name": "fundacion-ilusion-infantil",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Sitio web interactivo con Three.js para Fundación Ilusión Infantil",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
   "dependencies": {
-    "three": "^0.183.2",
-    "vite": "^8.0.7"
+    "three": "^0.160.0"
   }
 }
