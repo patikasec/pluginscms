@@ -1,0 +1,14 @@
+{
+    "id": "botble/payphone2",
+    "name": "Payphone2 Payment Gateway",
+    "namespace": "Botble\\Payphone2\\",
+    "provider": "Botble\\Payphone2\\Providers\\Payphone2ServiceProvider",
+    "author": "Your Name",
+    "url": "https://yoursite.com",
+    "version": "1.0.0",
+    "description": "Payphone payment gateway integration using Cajita de Pagos (redirect-based flow)",
+    "minimum_core_version": "7.3.0",
+    "require": [
+        "botble/payment"
+    ]
+}

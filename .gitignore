@@ -1,225 +1,46 @@
-# Dependencies
-node_modules/
-
-# Editor/IDE files
-.vscode/
-
-# Build artifacts
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
 dist/
 build/
 target/
 
-# Python related
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-selfcheck.json
-.pytest_cache/
-.mypy_cache/
-.coverage
-coverage/
-htmlcov/
+# Dependencies
+vendor/
+node_modules/
+*.lock
 
-# Logs
+# Logs and temp files
 *.log
-
-# Environment variables
-.env
-.env.local
-.env.*
-
-# OS generated files
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Icon?
-.directory
-.Trashes
-*.nib
-*~.nib
-.nib
-*~
-.DS_Store?
-._*
-.Spotlight-V100
-.Trash
-ehthumbs.db
-Thumbs.db
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-com.apple.timemachine.supported
-.AppleDouble
-.LSOverride
-
-# Temporary files
 *.tmp
-*.temp
-*.bak
 *.swp
 *.swo
 
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
-
-# Java related
-*.class
-*.jar
-*.war
-*.ear
-*.nar
-*.so
-*.dll
-*.dylib
-target/
-.gradle/
-build/
-
-# C/C++ related
-*.o
-*.a
-*.obj
-*.out
-*.exe
-*.dll
-*.so
-*.dylib
-*.ncb
-*.sdf
-*.suo
-*.pdb
-*.ilk
-*.res
-*.idb
-*.aps
-*.dep
-*.dsw
-*.dwp
-*.cache
-*.objdump
-*.gdb_history
-*.stackdump
-*.core
-*.ii
-*.sii
-*.vi
-*.sln.cache
-*.VC.db
-*.VC.VC.opendb
-
-# Go related
-*.a
-*.o
-*.so
-*.swp
-*.out
-*.exe
-*.dll
-*.dylib
-*.test
-*.prof
-go.mod
-go.sum
-
-# Ruby related
-*.gem
-*.rbc
-*.sassc
-.sass-cache
-capybara-*.html
-.rspec
-Guardfile
-.rvmrc
-*.gemspec
-Gemfile.lock
-.bundle/
-vendor/bundle/
-vendor/cache/
-vendor/gems/
-vendor/ruby/
-
-# Node.js related
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules/
-jspm_packages/
-*.min.js
-*.min.css
-
-# Web related
-*.css.map
-*.js.map
-*.min.js
-*.min.css
-
-# Testing
-coverage/
-*.gcov
-*.lcov
-*.info
-
-# CI/CD
-.semaphore/
-.github/
-
-# Documentation
-docs/_build/
-*.rst~
-
-# Julia related
-julia-*/
-
-# Zig related
-zig-out/
-zig-cache/
-
-# Other common ignores
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-*.tmp
-*.log
-*.env
+# Environment
 .env
 .env.local
-.env.*
-__pycache__/
-*.pyc
-node_modules/
-dist/
-build/
-target/
-.gradle/
-.mypy_cache/
-.pytest_cache/
-.coverage
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Coverage
 coverage/
 htmlcov/
+.coverage
+
+# PHP specific
+*.php~
+.php_cs.cache
+.sass-cache/
+```
